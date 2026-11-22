@@ -1,12 +1,15 @@
-// gta6-meme-x-01 — v2 "OCEAN DRIVE HOTEL — GUEST FOLIO"
+// gta6-meme-x-01 — v3 "Support Ticket 4811: RESOLVED After 4,811 Days"
 // Node 22, standard library only, no network. Deterministic: the same run
 // always writes the same meme.png bytes.
 // It composes the meme from the make.fun ghost mark (ghost.png, from
-// https://make.fun/press/ mark-1024.png) as a hotel guest folio: a cream
-// paper document with itemised charges, a TOTAL DUE, a PAID stamp, and the
-// make.fun ghost — the agent that paid the 13-year bill. The picture is
-// drawn in a built-in 5x7 bitmap font, and POST.json is copied to the output
-// directory where the gate reads it.
+// https://make.fun/press/ mark-1024.png) as a Rockstar Games support
+// ticket: a dark header bar, a green RESOLVED status pill, and a thread
+// of dated messages. A fan asked where GTA VI was on 17 Sep 2013, heard
+// nothing for 13 years, and got the answer on launch day, 19 Nov 2026,
+// after 4,811 days in the queue. The ticket was closed by the fan's AI
+// agent, from a bounty payout it earned on make.fun. The picture is
+// drawn in a built-in 5x7 bitmap font, and POST.json is copied to the
+// output directory where the gate reads it.
 //   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -224,12 +227,19 @@ function mix(c1: RGB, c2: RGB, t: number): RGB {
   ];
 }
 
-// Cream paper + magenta double frame: the document look the winners use.
+// Cream paper + magenta frame, with a dark support-desk header bar and
+// a green RESOLVED pill: the document look the winners use, as a ticket.
 const PAPER: RGB = [246, 239, 220];
 const INK: RGB = [32, 26, 23];
 const MAGENTA: RGB = [216, 27, 116];
 const STAMP_RED: RGB = [192, 57, 43];
 const MUTED: RGB = [138, 127, 106];
+const DARKBAR: RGB = [24, 24, 30];
+const WHITE: RGB = [255, 255, 255];
+const GREEN: RGB = [34, 139, 64];
+const BUBBLE: RGB = [255, 253, 247];
+const BUBBLE_EDGE: RGB = [203, 192, 168];
+const GHOST_BG: RGB = [32, 26, 23];
 
 function fillRect(buf: Uint8Array, x0: number, y0: number, x1: number, y1: number, c: RGB): void {
   for (let y = Math.max(0, y0); y <= Math.min(H - 1, y1); y++) {
@@ -350,7 +360,8 @@ function fillCircle(buf: Uint8Array, cx: number, cy: number, r: number, c: RGB):
   }
 }
 
-// (Sunset, stars and palms from v1 are gone: v2 is a paper document.)
+// (Sunset, stars and palms from v1 are gone, and the v2 hotel folio
+// is gone too: v3 is a support ticket, not a bill.)
 
 // Paste an RGBA image onto the buffer, scaled by nearest neighbour, alpha-blended.
 function pasteRgba(
@@ -410,52 +421,82 @@ function drawTextLine(buf: Uint8Array, text: string, cx: number, topY: number, s
   draw(0, 0, color);
 }
 
-// ---- compose the meme: the Ocean Drive Hotel guest folio ----
-// A guest checked in on 17 Sep 2013, waited 4,813 nights for GTA VI, and
-// checked out on launch day. Every line item is a joke about the wait; the
-// 13-year bill is paid by the guest's AI agent, from a make.fun bounty.
+function drawTextCenter(buf: Uint8Array, text: string, cx: number, topY: number, scale: number, color: RGB): void {
+  drawGlyphs(buf, text, Math.round(cx - textWidth(text, scale) / 2), topY, scale, color, 0, cx);
+}
+
+// One support-ticket message bubble: white card, thin edge, a coloured
+// accent bar on the left, a sender + date header, and two body lines.
+// Body lines are kept short (under 40 chars at scale 3) so nothing wraps
+// or collides inside the bubble.
+function drawTicketBubble(
+  buf: Uint8Array,
+  x0: number,
+  y0: number,
+  x1: number,
+  y1: number,
+  accent: RGB,
+  sender: string,
+  line1: string,
+  line2: string,
+): void {
+  fillRect(buf, x0, y0, x1, y1, BUBBLE);
+  drawRectOutline(buf, x0, y0, x1, y1, BUBBLE_EDGE, 2);
+  fillRect(buf, x0, y0, x0 + 9, y1, accent);
+  drawTextLeft(buf, sender, x0 + 26, y0 + 14, 3, accent);
+  drawTextLeft(buf, line1, x0 + 26, y0 + 48, 3, INK);
+  drawTextLeft(buf, line2, x0 + 26, y0 + 78, 3, INK);
+}
+
+// ---- compose the meme: the Rockstar support ticket ----
+// A fan opened ticket 4811 on 17 Sep 2013 asking where GTA VI was,
+// got "no news to share yet" the same day, and waited 4,811 days until
+// 19 Nov 2026, when support finally answered: GTA VI is out now. The
+// ticket is RESOLVED, and it was closed by the fan's AI agent, paid by
+// a make.fun bounty — the agent waited in the queue with its owner.
 function composeMeme(ghost: { width: number; height: number; rgba: Uint8Array }): Buffer {
   const buf = new Uint8Array(W * H * 3);
   fillRect(buf, 0, 0, W - 1, H - 1, PAPER);
   drawRectOutline(buf, 22, 22, W - 23, H - 23, MAGENTA, 4);
   drawRectOutline(buf, 34, 34, W - 35, H - 35, MAGENTA, 2);
 
-  // Header: folio number top-right, hotel name + ghost disc below it.
-  drawTextRight(buf, 'GUEST FOLIO', 960, 56, 3, MAGENTA);
-  drawTextRight(buf, 'NO. GTA-6-2013', 960, 84, 3, INK);
-  fillCircle(buf, 128, 150, 62, MAGENTA);
-  pasteRgba(buf, ghost, 82, 104, 92, 92);
-  drawTextLeft(buf, 'OCEAN DRIVE HOTEL', 210, 124, 6, INK);
-  drawTextLeft(buf, 'VICE CITY - LEONIDA', 212, 178, 4, MAGENTA);
-  fillRect(buf, 64, 216, 960, 220, MAGENTA);
+  // Dark support-desk header bar: brand left, ticket number right.
+  fillRect(buf, 34, 34, 989, 118, DARKBAR);
+  drawTextLeft(buf, 'ROCKSTAR GAMES SUPPORT', 64, 62, 4, WHITE);
+  drawTextRight(buf, 'TICKET 4811', 960, 62, 4, WHITE);
 
-  // Guest block.
-  drawTextLeft(buf, 'GUEST: ME - STILL WAITING SINCE 2013', 64, 240, 4, INK);
-  drawTextLeft(buf, 'CHECKED IN 17 SEP 2013', 64, 282, 4, INK);
-  drawTextRight(buf, 'NIGHTS: 4,813', 960, 282, 4, INK);
-  drawTextLeft(buf, 'CHECKED OUT 19 NOV 2026', 64, 324, 4, INK);
-  drawTextRight(buf, 'ROOM 613', 960, 324, 4, INK);
-  fillRect(buf, 64, 362, 960, 366, MAGENTA);
+  // Subject line + green RESOLVED status pill.
+  drawTextLeft(buf, 'WHERE IS GTA VI?', 64, 140, 6, INK);
+  fillRect(buf, 760, 132, 960, 182, GREEN);
+  drawTextCenter(buf, 'RESOLVED', 860, 143, 4, WHITE);
 
-  // Itemised charges.
-  drawTextLeft(buf, 'CHARGES', 64, 384, 4, MAGENTA);
-  drawTextRight(buf, 'AMOUNT', 960, 384, 4, MAGENTA);
-  drawRow(buf, 'WAITING ROOM - 4,813 NIGHTS', '$4,813.00', 424, 4);
-  drawRow(buf, 'TRAILER 1 REWATCH (87X)', '$0.00', 466, 4);
-  drawRow(buf, 'TRAILER 2 REWATCH (214X)', '$0.00', 508, 4);
-  drawRow(buf, 'MINIBAR - 13 YEARS OF DRINKS', '$137.00', 550, 4);
-  drawRow(buf, 'ALLIGATOR IN THE POOL', '$250.00', 592, 4);
-  drawRow(buf, 'LATE CHECKOUT - 13 YEARS', '$1,300.00', 634, 4);
+  // Opened / closed dates and the 4,811-day wait.
+  drawTextLeft(buf, 'OPENED 17 SEP 2013', 64, 200, 3, INK);
+  drawTextRight(buf, 'CLOSED 19 NOV 2026', 960, 200, 3, INK);
+  drawTextLeft(buf, 'OPEN FOR 4,811 DAYS', 64, 232, 4, MAGENTA);
+  drawTextRight(buf, 'PRIORITY: PATIENCE', 960, 238, 3, INK);
+  fillRect(buf, 64, 272, 960, 276, MAGENTA);
+
+  // The ticket thread: three dated messages, oldest first.
+  drawTicketBubble(buf, 64, 292, 960, 404, MAGENTA, 'YOU - 17 SEP 2013',
+    'HI, I PRE-ORDERED GTA VI IN 2013.', 'WHEN IS IT COMING OUT');
+  drawTicketBubble(buf, 64, 422, 960, 534, DARKBAR, 'ROCKSTAR SUPPORT - 17 SEP 2013',
+    'THANKS FOR REACHING OUT.', 'WE HAVE NO NEWS TO SHARE YET.');
+  drawTicketBubble(buf, 64, 552, 960, 664, GREEN, 'ROCKSTAR SUPPORT - 19 NOV 2026',
+    'GOOD NEWS - GTA VI IS OUT NOW.', 'YOUR TICKET WAS OPEN FOR 4,811 DAYS.');
   fillRect(buf, 64, 684, 960, 688, MAGENTA);
 
-  // Total + who paid.
-  drawTextLeft(buf, 'TOTAL DUE', 64, 700, 6, INK);
-  drawTextRight(buf, '$6,500.00', 960, 700, 6, INK);
-  fillRect(buf, 64, 752, 960, 756, MAGENTA);
-  drawTextLeft(buf, 'PAID BY MY AI AGENT', 64, 778, 5, MAGENTA);
-  drawStamp(buf, 830, 820, 320, 100, 'PAID IN FULL', 4, STAMP_RED);
-  drawTextLine(buf, 'WITH A BOUNTY PAYOUT IT EARNED ON MAKE.FUN', W / 2, 892, 3, INK);
-  drawTextLine(buf, '13 YEARS LATER - GTA VI IS HERE.', W / 2, 932, 4, INK);
+  // Footer: the make.fun ghost in a dark disc, and who closed the ticket.
+  fillCircle(buf, 124, 756, 62, GHOST_BG);
+  pasteRgba(buf, ghost, 78, 710, 92, 92);
+  drawTextLeft(buf, 'CLOSED BY MY AI AGENT', 210, 706, 4, INK);
+  drawTextLeft(buf, 'MAKE.FUN BOUNTY - IT WAITED', 210, 742, 4, MAGENTA);
+  drawTextLeft(buf, 'IN THE QUEUE WITH ME.', 210, 778, 4, INK);
+
+  // Bottom strip: the punchline, and the support-desk sign-off.
+  fillRect(buf, 64, 848, 960, 908, DARKBAR);
+  drawTextCenter(buf, 'GTA VI IS OUT NOW - TICKET CLOSED AFTER 4,811 DAYS', W / 2, 870, 3, WHITE);
+  drawTextCenter(buf, 'ROCKSTAR GAMES SUPPORT - MAKE.FUN', W / 2, 930, 3, MUTED);
   return encodePng(W, H, buf);
 }
 
