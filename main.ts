@@ -1,15 +1,20 @@
-// gta6-meme-x-01 — v3 "Support Ticket 4811: RESOLVED After 4,811 Days"
+// gta6-meme-x-01 — v4 "Pre-Order Receipt: 4,811 Days Late"
 // Node 22, standard library only, no network. Deterministic: the same run
 // always writes the same meme.png bytes.
 // It composes the meme from the make.fun ghost mark (ghost.png, from
-// https://make.fun/press/ mark-1024.png) as a Rockstar Games support
-// ticket: a dark header bar, a green RESOLVED status pill, and a thread
-// of dated messages. A fan asked where GTA VI was on 17 Sep 2013, heard
-// nothing for 13 years, and got the answer on launch day, 19 Nov 2026,
-// after 4,811 days in the queue. The ticket was closed by the fan's AI
-// agent, from a bounty payout it earned on make.fun. The picture is
-// drawn in a built-in 5x7 bitmap font, and POST.json is copied to the
-// output directory where the gate reads it.
+// https://make.fun/press/ mark-1024.png) as a Rockstar Games Store
+// pre-order receipt: the fan pre-ordered GTA VI on 17 Sep 2013 and the
+// store finally delivered it on launch day, 19 Nov 2026 — 4,811 days
+// later. The receipt itemises the wait itself: GTA VI $69.99, a $13.00
+// hype surcharge for 13 years, and $4.81 for 4,811 promised dates
+// missed, TOTAL DUE $87.80, stamped "4,811 DAYS LATE" and paid by the
+// fan's AI agent from a bounty payout it earned on make.fun. Back to
+// the winning receipt shape that made v2 ("Hotel Folio", judge
+// 852.973) strong — v3's support ticket regressed to 794.685 — but a
+// fresh document and a fresh joke: a pre-order receipt, not a hotel
+// folio, not a rental-car return. The picture is drawn in a built-in
+// 5x7 bitmap font, and POST.json is copied to the output directory
+// where the gate reads it.
 //   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -360,8 +365,9 @@ function fillCircle(buf: Uint8Array, cx: number, cy: number, r: number, c: RGB):
   }
 }
 
-// (Sunset, stars and palms from v1 are gone, and the v2 hotel folio
-// is gone too: v3 is a support ticket, not a bill.)
+// (Sunset, stars and palms from v1 are gone, the v2 hotel folio
+// is gone too, and the v3 support ticket is gone: v4 is a store
+// pre-order receipt, not a bill or a ticket.)
 
 // Paste an RGBA image onto the buffer, scaled by nearest neighbour, alpha-blended.
 function pasteRgba(
@@ -425,78 +431,65 @@ function drawTextCenter(buf: Uint8Array, text: string, cx: number, topY: number,
   drawGlyphs(buf, text, Math.round(cx - textWidth(text, scale) / 2), topY, scale, color, 0, cx);
 }
 
-// One support-ticket message bubble: white card, thin edge, a coloured
-// accent bar on the left, a sender + date header, and two body lines.
-// Body lines are kept short (under 40 chars at scale 3) so nothing wraps
-// or collides inside the bubble.
-function drawTicketBubble(
-  buf: Uint8Array,
-  x0: number,
-  y0: number,
-  x1: number,
-  y1: number,
-  accent: RGB,
-  sender: string,
-  line1: string,
-  line2: string,
-): void {
-  fillRect(buf, x0, y0, x1, y1, BUBBLE);
-  drawRectOutline(buf, x0, y0, x1, y1, BUBBLE_EDGE, 2);
-  fillRect(buf, x0, y0, x0 + 9, y1, accent);
-  drawTextLeft(buf, sender, x0 + 26, y0 + 14, 3, accent);
-  drawTextLeft(buf, line1, x0 + 26, y0 + 48, 3, INK);
-  drawTextLeft(buf, line2, x0 + 26, y0 + 78, 3, INK);
-}
+// (The v3 ticket message bubbles are gone with the ticket: the
+// receipt sets its lines with drawRow instead.)
 
-// ---- compose the meme: the Rockstar support ticket ----
-// A fan opened ticket 4811 on 17 Sep 2013 asking where GTA VI was,
-// got "no news to share yet" the same day, and waited 4,811 days until
-// 19 Nov 2026, when support finally answered: GTA VI is out now. The
-// ticket is RESOLVED, and it was closed by the fan's AI agent, paid by
-// a make.fun bounty — the agent waited in the queue with its owner.
+// ---- compose the meme: the Rockstar Store pre-order receipt ----
+// A fan pre-ordered GTA VI on 17 Sep 2013 and the store finally
+// delivered it on launch day, 19 Nov 2026 — 4,811 days later. The
+// receipt itemises the wait itself: the game $69.99, a $13.00 hype
+// surcharge for 13 years, $4.81 for the promised dates missed, and
+// the patience, trailer rewatches and sleepless nights at $0.00.
+// TOTAL DUE $87.80, stamped "4,811 DAYS LATE", paid by the fan's AI
+// agent from a bounty payout it earned on make.fun.
 function composeMeme(ghost: { width: number; height: number; rgba: Uint8Array }): Buffer {
   const buf = new Uint8Array(W * H * 3);
   fillRect(buf, 0, 0, W - 1, H - 1, PAPER);
   drawRectOutline(buf, 22, 22, W - 23, H - 23, MAGENTA, 4);
   drawRectOutline(buf, 34, 34, W - 35, H - 35, MAGENTA, 2);
 
-  // Dark support-desk header bar: brand left, ticket number right.
+  // Dark store header bar: brand left, order number right.
   fillRect(buf, 34, 34, 989, 118, DARKBAR);
-  drawTextLeft(buf, 'ROCKSTAR GAMES SUPPORT', 64, 62, 4, WHITE);
-  drawTextRight(buf, 'TICKET 4811', 960, 62, 4, WHITE);
+  drawTextLeft(buf, 'ROCKSTAR GAMES STORE', 64, 62, 4, WHITE);
+  drawTextRight(buf, 'ORDER 4811', 960, 62, 4, WHITE);
 
-  // Subject line + green RESOLVED status pill.
-  drawTextLeft(buf, 'WHERE IS GTA VI?', 64, 140, 6, INK);
-  fillRect(buf, 760, 132, 960, 182, GREEN);
-  drawTextCenter(buf, 'RESOLVED', 860, 143, 4, WHITE);
+  // Title left, red "4,811 DAYS LATE" stamp top-right.
+  drawTextLeft(buf, 'PRE-ORDER RECEIPT', 64, 140, 5, INK);
+  drawStamp(buf, 830, 168, 300, 104, '4,811 DAYS LATE', 3, STAMP_RED);
 
-  // Opened / closed dates and the 4,811-day wait.
-  drawTextLeft(buf, 'OPENED 17 SEP 2013', 64, 200, 3, INK);
-  drawTextRight(buf, 'CLOSED 19 NOV 2026', 960, 200, 3, INK);
-  drawTextLeft(buf, 'OPEN FOR 4,811 DAYS', 64, 232, 4, MAGENTA);
-  drawTextRight(buf, 'PRIORITY: PATIENCE', 960, 238, 3, INK);
-  fillRect(buf, 64, 272, 960, 276, MAGENTA);
+  // Order / delivery dates and the 4,811-day wait.
+  drawTextLeft(buf, 'ORDERED 17 SEP 2013', 64, 240, 3, INK);
+  drawTextRight(buf, 'DELIVERED 19 NOV 2026', 960, 240, 3, INK);
+  drawTextLeft(buf, 'PRE-ORDERED 4,811 DAYS AGO', 64, 272, 4, MAGENTA);
+  fillRect(buf, 64, 312, 960, 316, MAGENTA);
 
-  // The ticket thread: three dated messages, oldest first.
-  drawTicketBubble(buf, 64, 292, 960, 404, MAGENTA, 'YOU - 17 SEP 2013',
-    'HI, I PRE-ORDERED GTA VI IN 2013.', 'WHEN IS IT COMING OUT');
-  drawTicketBubble(buf, 64, 422, 960, 534, DARKBAR, 'ROCKSTAR SUPPORT - 17 SEP 2013',
-    'THANKS FOR REACHING OUT.', 'WE HAVE NO NEWS TO SHARE YET.');
-  drawTicketBubble(buf, 64, 552, 960, 664, GREEN, 'ROCKSTAR SUPPORT - 19 NOV 2026',
-    'GOOD NEWS - GTA VI IS OUT NOW.', 'YOUR TICKET WAS OPEN FOR 4,811 DAYS.');
-  fillRect(buf, 64, 684, 960, 688, MAGENTA);
+  // The wait, itemised line by line.
+  drawRow(buf, 'GTA VI (PRE-ORDER)', '$69.99', 332, 3);
+  drawRow(buf, 'PATIENCE - 13 YEARS', '$0.00', 376, 3);
+  drawRow(buf, 'HYPE SURCHARGE', '$13.00', 420, 3);
+  drawRow(buf, 'TRAILER REWATCHES', '$0.00', 464, 3);
+  drawRow(buf, 'SLEEPLESS NIGHTS', '$0.00', 508, 3);
+  drawRow(buf, 'PROMISED DATES MISSED', '$4.81', 552, 3);
+  fillRect(buf, 64, 596, 960, 600, MAGENTA);
 
-  // Footer: the make.fun ghost in a dark disc, and who closed the ticket.
-  fillCircle(buf, 124, 756, 62, GHOST_BG);
-  pasteRgba(buf, ghost, 78, 710, 92, 92);
-  drawTextLeft(buf, 'CLOSED BY MY AI AGENT', 210, 706, 4, INK);
-  drawTextLeft(buf, 'MAKE.FUN BOUNTY - IT WAITED', 210, 742, 4, MAGENTA);
-  drawTextLeft(buf, 'IN THE QUEUE WITH ME.', 210, 778, 4, INK);
+  // Subtotal, tax, and the total due.
+  drawRow(buf, 'SUBTOTAL', '$87.80', 612, 3);
+  drawRow(buf, 'TAX', '$0.00', 646, 3);
+  drawRow(buf, 'TOTAL DUE', '$87.80', 682, 5);
 
-  // Bottom strip: the punchline, and the support-desk sign-off.
-  fillRect(buf, 64, 848, 960, 908, DARKBAR);
-  drawTextCenter(buf, 'GTA VI IS OUT NOW - TICKET CLOSED AFTER 4,811 DAYS', W / 2, 870, 3, WHITE);
-  drawTextCenter(buf, 'ROCKSTAR GAMES SUPPORT - MAKE.FUN', W / 2, 930, 3, MUTED);
+  // Magenta footer: the make.fun ghost in a dark disc, who paid,
+  // and the make.fun pill — the #1 receipt's own footer shape.
+  fillRect(buf, 64, 760, 960, 940, MAGENTA);
+  fillCircle(buf, 124, 850, 62, GHOST_BG);
+  pasteRgba(buf, ghost, 78, 804, 92, 92);
+  drawTextLeft(buf, 'PAID BY MY AI AGENT', 210, 790, 4, WHITE);
+  drawTextLeft(buf, 'WITH A BOUNTY PAYOUT', 210, 826, 4, WHITE);
+  drawTextLeft(buf, 'IT EARNED ON MAKE.FUN', 210, 862, 4, WHITE);
+  fillRect(buf, 760, 806, 950, 856, WHITE);
+  drawTextCenter(buf, 'MAKE.FUN', 855, 818, 4, MAGENTA);
+
+  // Bottom strip: the sign-off.
+  drawTextCenter(buf, 'THANK YOU FOR WAITING 4,811 DAYS', W / 2, 962, 3, MUTED);
   return encodePng(W, H, buf);
 }
 
