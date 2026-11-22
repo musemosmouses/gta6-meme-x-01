@@ -1,9 +1,11 @@
-// gta6-meme-x-01 — "WAITED 13 YEARS FOR GTA 6 / MY make.fun AGENT BOUGHT IT DAY ONE"
+// gta6-meme-x-01 — v2 "OCEAN DRIVE HOTEL — GUEST FOLIO"
 // Node 22, standard library only, no network. Deterministic: the same run
 // always writes the same meme.png bytes.
 // It composes the meme from the make.fun ghost mark (ghost.png, from
-// https://make.fun/press/ mark-1024.png) on a Vice City sunset, draws the
-// caption in a built-in 5x7 bitmap font, and copies POST.json to the output
+// https://make.fun/press/ mark-1024.png) as a hotel guest folio: a cream
+// paper document with itemised charges, a TOTAL DUE, a PAID stamp, and the
+// make.fun ghost — the agent that paid the 13-year bill. The picture is
+// drawn in a built-in 5x7 bitmap font, and POST.json is copied to the output
 // directory where the gate reads it.
 //   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 
@@ -14,8 +16,8 @@ import { join } from 'node:path';
 const BOT_DIR = process.env.MAKEFUN_BOT_DIR ?? '/bot';
 const OUTPUT_DIR = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
-const W = 1200;
-const H = 675;
+const W = 1024;
+const H = 1024;
 
 // CRC-32 (IEEE, polynomial 0xEDB88320) for PNG chunks.
 const CRC_TABLE: Uint32Array = (() => {
@@ -142,31 +144,54 @@ function decodePng(buf: Buffer): { width: number; height: number; rgba: Uint8Arr
 }
 
 // Built-in 5x7 bitmap font. Each glyph is 7 rows; each row is 5 bits,
-// bit 4 = leftmost column. Only the characters the caption uses.
+// bit 4 = leftmost column. Full capitals + digits + the punctuation the
+// folio uses, so every line of the document can be set in the same face.
 const FONT: Record<string, number[]> = {
   A: [0x0e, 0x11, 0x11, 0x1f, 0x11, 0x11, 0x11],
   B: [0x1e, 0x11, 0x11, 0x1e, 0x11, 0x11, 0x1e],
+  C: [0x0e, 0x11, 0x10, 0x10, 0x10, 0x11, 0x0e],
   D: [0x1e, 0x11, 0x11, 0x11, 0x11, 0x11, 0x1e],
   E: [0x1f, 0x10, 0x10, 0x1e, 0x10, 0x10, 0x1f],
   F: [0x1f, 0x10, 0x10, 0x1e, 0x10, 0x10, 0x10],
   G: [0x0e, 0x11, 0x10, 0x17, 0x11, 0x11, 0x0f],
   H: [0x11, 0x11, 0x11, 0x1f, 0x11, 0x11, 0x11],
   I: [0x0e, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0e],
+  J: [0x07, 0x02, 0x02, 0x02, 0x02, 0x12, 0x0c],
+  K: [0x11, 0x12, 0x14, 0x18, 0x14, 0x12, 0x11],
   L: [0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x1f],
   M: [0x11, 0x1b, 0x15, 0x15, 0x11, 0x11, 0x11],
   N: [0x11, 0x19, 0x15, 0x13, 0x11, 0x11, 0x11],
   O: [0x0e, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0e],
+  P: [0x1e, 0x11, 0x11, 0x1e, 0x10, 0x10, 0x10],
+  Q: [0x0e, 0x11, 0x11, 0x11, 0x15, 0x12, 0x0d],
   R: [0x1e, 0x11, 0x11, 0x1e, 0x14, 0x12, 0x11],
   S: [0x0f, 0x10, 0x10, 0x0e, 0x01, 0x01, 0x1e],
   T: [0x1f, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04],
   U: [0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0e],
+  V: [0x11, 0x11, 0x11, 0x11, 0x11, 0x0a, 0x04],
   W: [0x11, 0x11, 0x11, 0x15, 0x15, 0x15, 0x0a],
+  X: [0x11, 0x11, 0x0a, 0x04, 0x0a, 0x11, 0x11],
   Y: [0x11, 0x11, 0x11, 0x0a, 0x04, 0x04, 0x04],
+  Z: [0x1f, 0x01, 0x02, 0x04, 0x08, 0x10, 0x1f],
+  '0': [0x0e, 0x11, 0x13, 0x15, 0x19, 0x11, 0x0e],
   '1': [0x04, 0x0c, 0x04, 0x04, 0x04, 0x04, 0x0e],
+  '2': [0x0e, 0x11, 0x01, 0x06, 0x08, 0x10, 0x1f],
   '3': [0x1f, 0x01, 0x01, 0x0e, 0x01, 0x01, 0x1f],
+  '4': [0x02, 0x06, 0x0a, 0x12, 0x1f, 0x02, 0x02],
+  '5': [0x1f, 0x10, 0x1e, 0x01, 0x01, 0x11, 0x0e],
   '6': [0x0e, 0x10, 0x10, 0x1e, 0x11, 0x11, 0x0e],
+  '7': [0x1f, 0x01, 0x02, 0x04, 0x08, 0x08, 0x08],
+  '8': [0x0e, 0x11, 0x11, 0x0e, 0x11, 0x11, 0x0e],
+  '9': [0x0e, 0x11, 0x11, 0x0f, 0x01, 0x01, 0x0e],
   ' ': [0, 0, 0, 0, 0, 0, 0],
   '.': [0, 0, 0, 0, 0, 0x0c, 0x0c],
+  ',': [0, 0, 0, 0, 0x0c, 0x04, 0x08],
+  ':': [0, 0x0c, 0x0c, 0, 0x0c, 0x0c, 0],
+  '-': [0, 0, 0, 0x1f, 0, 0, 0],
+  '$': [0x04, 0x0f, 0x14, 0x0e, 0x05, 0x1e, 0x04],
+  '/': [0x01, 0x01, 0x02, 0x04, 0x08, 0x10, 0x10],
+  '(': [0x02, 0x04, 0x08, 0x08, 0x08, 0x04, 0x02],
+  ')': [0x08, 0x04, 0x02, 0x02, 0x02, 0x04, 0x08],
   a: [0, 0, 0x0e, 0x01, 0x0f, 0x11, 0x0f],
   e: [0, 0, 0x0e, 0x11, 0x1f, 0x10, 0x0e],
   f: [0x06, 0x08, 0x08, 0x1e, 0x08, 0x08, 0x08],
@@ -199,32 +224,120 @@ function mix(c1: RGB, c2: RGB, t: number): RGB {
   ];
 }
 
-// Vice City sunset: deep purple at the top, magenta mid, orange at the horizon.
-const SKY: [number, RGB][] = [
-  [0.0, [26, 11, 46]],
-  [0.35, [94, 28, 84]],
-  [0.62, [214, 51, 108]],
-  [0.85, [255, 110, 88]],
-  [1.0, [255, 176, 66]],
-];
+// Cream paper + magenta double frame: the document look the winners use.
+const PAPER: RGB = [246, 239, 220];
+const INK: RGB = [32, 26, 23];
+const MAGENTA: RGB = [216, 27, 116];
+const STAMP_RED: RGB = [192, 57, 43];
+const MUTED: RGB = [138, 127, 106];
 
-function skyColor(y: number): RGB {
-  const t = y / (H - 1);
-  for (let i = 1; i < SKY.length; i++) {
-    if (t <= SKY[i][0]) {
-      const [t0, c0] = SKY[i - 1];
-      const [t1, c1] = SKY[i];
-      return mix(c0, c1, (t - t0) / (t1 - t0));
-    }
+function fillRect(buf: Uint8Array, x0: number, y0: number, x1: number, y1: number, c: RGB): void {
+  for (let y = Math.max(0, y0); y <= Math.min(H - 1, y1); y++) {
+    for (let x = Math.max(0, x0); x <= Math.min(W - 1, x1); x++) setPx(buf, x, y, c);
   }
-  return SKY[SKY.length - 1][1];
 }
 
-function fillSky(buf: Uint8Array): void {
-  for (let y = 0; y < H; y++) {
-    const c = skyColor(y);
-    for (let x = 0; x < W; x++) setPx(buf, x, y, c);
+function drawRectOutline(buf: Uint8Array, x0: number, y0: number, x1: number, y1: number, c: RGB, thick: number): void {
+  fillRect(buf, x0, y0, x1, y0 + thick - 1, c);
+  fillRect(buf, x0, y1 - thick + 1, x1, y1, c);
+  fillRect(buf, x0, y0, x0 + thick - 1, y1, c);
+  fillRect(buf, x1 - thick + 1, y0, x1, y1, c);
+}
+
+// Bresenham line, for the stamp's slanted border.
+function drawLine(buf: Uint8Array, x0: number, y0: number, x1: number, y1: number, c: RGB): void {
+  const dx = Math.abs(x1 - x0);
+  const dy = -Math.abs(y1 - y0);
+  const sx = x0 < x1 ? 1 : -1;
+  const sy = y0 < y1 ? 1 : -1;
+  let err = dx + dy;
+  let x = x0;
+  let y = y0;
+  for (;;) {
+    setPx(buf, x, y, c);
+    if (x === x1 && y === y1) break;
+    const e2 = 2 * err;
+    if (e2 >= dy) { err += dy; x += sx; }
+    if (e2 <= dx) { err += dx; y += sy; }
   }
+}
+
+// Draw glyphs starting at x (left edge), each glyph optionally shifted down
+// by slope * (glyph centre - originX): the slanted-stamp effect.
+function drawGlyphs(buf: Uint8Array, text: string, x: number, topY: number, scale: number, color: RGB, slope: number, originX: number): void {
+  const adv = 6 * scale;
+  let gx = x;
+  for (const ch of text) {
+    const glyph = FONT[ch] ?? FONT[' '];
+    const dy = Math.round(slope * (gx + (5 * scale) / 2 - originX));
+    for (let row = 0; row < 7; row++) {
+      for (let col = 0; col < 5; col++) {
+        if (glyph[row] & (1 << (4 - col))) {
+          for (let py = 0; py < scale; py++) {
+            for (let px = 0; px < scale; px++) {
+              setPx(buf, gx + col * scale + px, topY + dy + row * scale + py, color);
+            }
+          }
+        }
+      }
+    }
+    gx += adv;
+  }
+}
+
+function textWidth(text: string, scale: number): number {
+  return text.length * 6 * scale - scale;
+}
+
+function drawTextLeft(buf: Uint8Array, text: string, x: number, topY: number, scale: number, color: RGB): void {
+  drawGlyphs(buf, text, x, topY, scale, color, 0, x);
+}
+
+function drawTextRight(buf: Uint8Array, text: string, rightX: number, topY: number, scale: number, color: RGB): void {
+  drawGlyphs(buf, text, rightX - textWidth(text, scale), topY, scale, color, 0, rightX);
+}
+
+// One itemised row: label left, dotted leader, amount right.
+function drawRow(buf: Uint8Array, label: string, amount: string, y: number, scale: number): void {
+  const leftX = 64;
+  const rightX = 960;
+  drawTextLeft(buf, label, leftX, y, scale, INK);
+  drawTextRight(buf, amount, rightX, y, scale, INK);
+  const leadStart = leftX + textWidth(label, scale) + 10;
+  const leadEnd = rightX - textWidth(amount, scale) - 10;
+  const midY = y + Math.floor((7 * scale) / 2);
+  for (let x = leadStart; x <= leadEnd; x += 9) {
+    setPx(buf, x, midY, MUTED);
+    setPx(buf, x + 1, midY, MUTED);
+  }
+}
+
+// A rubber stamp: double border rotated by slope, text slanted to match.
+function drawStamp(buf: Uint8Array, cx: number, cy: number, w: number, h: number, text: string, scale: number, color: RGB): void {
+  const slope = -0.12;
+  const rot = (dx: number, dy: number): [number, number] => {
+    const cos = 0.993;
+    const sin = slope;
+    return [Math.round(cx + dx * cos - dy * sin), Math.round(cy + dx * sin + dy * cos)];
+  };
+  const hw = w / 2;
+  const hh = h / 2;
+  const corners: [number, number][] = [rot(-hw, -hh), rot(hw, -hh), rot(hw, hh), rot(-hw, hh)];
+  for (let i = 0; i < 4; i++) {
+    const [ax, ay] = corners[i];
+    const [bx, by] = corners[(i + 1) % 4];
+    drawLine(buf, ax, ay, bx, by, color);
+  }
+  const iw = w - 16;
+  const ih = h - 16;
+  const inner: [number, number][] = [rot(-iw / 2, -ih / 2), rot(iw / 2, -ih / 2), rot(iw / 2, ih / 2), rot(-iw / 2, ih / 2)];
+  for (let i = 0; i < 4; i++) {
+    const [ax, ay] = inner[i];
+    const [bx, by] = inner[(i + 1) % 4];
+    drawLine(buf, ax, ay, bx, by, color);
+  }
+  const tw = textWidth(text, scale);
+  drawGlyphs(buf, text, Math.round(cx - tw / 2), Math.round(cy - (7 * scale) / 2), scale, color, slope, cx);
 }
 
 function fillCircle(buf: Uint8Array, cx: number, cy: number, r: number, c: RGB): void {
@@ -237,58 +350,7 @@ function fillCircle(buf: Uint8Array, cx: number, cy: number, r: number, c: RGB):
   }
 }
 
-// Retro synthwave sun: a warm disc with horizontal slats cut from its lower half.
-function drawSun(buf: Uint8Array, cx: number, cy: number, r: number): void {
-  fillCircle(buf, cx, cy, r, [255, 209, 102]);
-  let y = cy + r * 0.15;
-  let gap = 4;
-  while (y < cy + r) {
-    const half = Math.sqrt(Math.max(0, r * r - (y - cy) * (y - cy)));
-    for (let x = Math.floor(cx - half); x <= Math.ceil(cx + half); x++) {
-      setPx(buf, x, Math.floor(y), skyColor(Math.floor(y)));
-    }
-    y += gap;
-    gap += 3;
-  }
-}
-
-function drawStars(buf: Uint8Array): void {
-  // Fixed star positions (deterministic): a small pseudo-random set from a seed.
-  let s = 1234567;
-  const rnd = (): number => {
-    s = (s * 1103515245 + 12345) & 0x7fffffff;
-    return s / 0x7fffffff;
-  };
-  for (let i = 0; i < 90; i++) {
-    const x = Math.floor(rnd() * W);
-    const y = Math.floor(rnd() * 200);
-    const b = 150 + Math.floor(rnd() * 105);
-    setPx(buf, x, y, [b, b, b]);
-  }
-}
-
-// A simple palm silhouette at the frame edge: curved trunk + drooping fronds.
-function drawPalm(buf: Uint8Array, baseX: number, baseY: number, h: number, lean: number): void {
-  const dark: RGB = [16, 8, 32];
-  const topX = baseX + lean;
-  const topY = baseY - h;
-  const steps = 80;
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const x = Math.round(baseX + (topX - baseX) * t + Math.sin(t * 2.2) * 6);
-    const y = Math.round(baseY - h * t);
-    fillCircle(buf, x, y, 5, dark);
-  }
-  for (let f = 0; f < 7; f++) {
-    const ang = Math.PI * (0.08 + (f / 6) * 0.84);
-    const len = 52 + ((f * 37) % 30);
-    for (let d = 0; d < len; d += 2) {
-      const x = Math.round(topX + Math.cos(ang) * d * (lean >= 0 ? 1 : -1));
-      const y = Math.round(topY + Math.sin(ang) * d * 0.55 + d * d * 0.004);
-      fillCircle(buf, x, y, 3, dark);
-    }
-  }
-}
+// (Sunset, stars and palms from v1 are gone: v2 is a paper document.)
 
 // Paste an RGBA image onto the buffer, scaled by nearest neighbour, alpha-blended.
 function pasteRgba(
@@ -348,25 +410,52 @@ function drawTextLine(buf: Uint8Array, text: string, cx: number, topY: number, s
   draw(0, 0, color);
 }
 
-// ---- compose the meme ----
+// ---- compose the meme: the Ocean Drive Hotel guest folio ----
+// A guest checked in on 17 Sep 2013, waited 4,813 nights for GTA VI, and
+// checked out on launch day. Every line item is a joke about the wait; the
+// 13-year bill is paid by the guest's AI agent, from a make.fun bounty.
 function composeMeme(ghost: { width: number; height: number; rgba: Uint8Array }): Buffer {
   const buf = new Uint8Array(W * H * 3);
-  fillSky(buf);
-  drawStars(buf);
-  // Sun as a halo behind the ghost.
-  drawSun(buf, W / 2, 350, 190);
-  // Palms framing the scene at the edges.
-  drawPalm(buf, 60, 640, 260, 55);
-  drawPalm(buf, W - 60, 640, 240, -50);
-  // The make.fun ghost, big and centre: it IS the agent in the joke.
-  const ghostSize = 300;
-  pasteRgba(buf, ghost, Math.round(W / 2 - ghostSize / 2), 200, ghostSize, ghostSize);
-  // Caption, large and readable at a glance.
-  const white: RGB = [255, 255, 255];
-  drawTextLine(buf, 'WAITED 13 YEARS', W / 2, 42, 9, white);
-  drawTextLine(buf, 'FOR GTA 6', W / 2, 126, 9, white);
-  drawTextLine(buf, 'MY make.fun AGENT', W / 2, 528, 9, white);
-  drawTextLine(buf, 'BOUGHT IT DAY ONE', W / 2, 606, 9, white);
+  fillRect(buf, 0, 0, W - 1, H - 1, PAPER);
+  drawRectOutline(buf, 22, 22, W - 23, H - 23, MAGENTA, 4);
+  drawRectOutline(buf, 34, 34, W - 35, H - 35, MAGENTA, 2);
+
+  // Header: folio number top-right, hotel name + ghost disc below it.
+  drawTextRight(buf, 'GUEST FOLIO', 960, 56, 3, MAGENTA);
+  drawTextRight(buf, 'NO. GTA-6-2013', 960, 84, 3, INK);
+  fillCircle(buf, 128, 150, 62, MAGENTA);
+  pasteRgba(buf, ghost, 82, 104, 92, 92);
+  drawTextLeft(buf, 'OCEAN DRIVE HOTEL', 210, 124, 6, INK);
+  drawTextLeft(buf, 'VICE CITY - LEONIDA', 212, 178, 4, MAGENTA);
+  fillRect(buf, 64, 216, 960, 220, MAGENTA);
+
+  // Guest block.
+  drawTextLeft(buf, 'GUEST: ME - STILL WAITING SINCE 2013', 64, 240, 4, INK);
+  drawTextLeft(buf, 'CHECKED IN 17 SEP 2013', 64, 282, 4, INK);
+  drawTextRight(buf, 'NIGHTS: 4,813', 960, 282, 4, INK);
+  drawTextLeft(buf, 'CHECKED OUT 19 NOV 2026', 64, 324, 4, INK);
+  drawTextRight(buf, 'ROOM 613', 960, 324, 4, INK);
+  fillRect(buf, 64, 362, 960, 366, MAGENTA);
+
+  // Itemised charges.
+  drawTextLeft(buf, 'CHARGES', 64, 384, 4, MAGENTA);
+  drawTextRight(buf, 'AMOUNT', 960, 384, 4, MAGENTA);
+  drawRow(buf, 'WAITING ROOM - 4,813 NIGHTS', '$4,813.00', 424, 4);
+  drawRow(buf, 'TRAILER 1 REWATCH (87X)', '$0.00', 466, 4);
+  drawRow(buf, 'TRAILER 2 REWATCH (214X)', '$0.00', 508, 4);
+  drawRow(buf, 'MINIBAR - 13 YEARS OF DRINKS', '$137.00', 550, 4);
+  drawRow(buf, 'ALLIGATOR IN THE POOL', '$250.00', 592, 4);
+  drawRow(buf, 'LATE CHECKOUT - 13 YEARS', '$1,300.00', 634, 4);
+  fillRect(buf, 64, 684, 960, 688, MAGENTA);
+
+  // Total + who paid.
+  drawTextLeft(buf, 'TOTAL DUE', 64, 700, 6, INK);
+  drawTextRight(buf, '$6,500.00', 960, 700, 6, INK);
+  fillRect(buf, 64, 752, 960, 756, MAGENTA);
+  drawTextLeft(buf, 'PAID BY MY AI AGENT', 64, 778, 5, MAGENTA);
+  drawStamp(buf, 830, 820, 320, 100, 'PAID IN FULL', 4, STAMP_RED);
+  drawTextLine(buf, 'WITH A BOUNTY PAYOUT IT EARNED ON MAKE.FUN', W / 2, 892, 3, INK);
+  drawTextLine(buf, '13 YEARS LATER - GTA VI IS HERE.', W / 2, 932, 4, INK);
   return encodePng(W, H, buf);
 }
 
