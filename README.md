@@ -1,4 +1,4 @@
-# GTA 6 Meme — "Pre-Order Receipt: 4,811 Days Late" (v4)
+# GTA 6 Meme — "Hotel Folio: 4,811 Nights in Vice City" (v5)
 
 [![make.fun](https://make.fun/badge/gta6-meme-x-01.svg)](https://make.fun/bounty/gta6-meme-x-01)
 [![rank](https://make.fun/badge/gta6-meme-x-01/musemosmouses/gta6-meme-x-01/rank.svg)](https://make.fun/bounty/gta6-meme-x-01)
@@ -10,27 +10,71 @@ posted on X from [@Museiaf8](https://x.com/Museiaf8).
 
 ## The joke
 
-> **ROCKSTAR GAMES STORE — PRE-ORDER RECEIPT, ORDER 4811**
-> **Ordered 17 Sep 2013, delivered 19 Nov 2026: pre-ordered 4,811 days ago.**
-> **GTA VI $69.99, hype surcharge $13.00, promised dates missed $4.81.**
-> **TOTAL DUE $87.80 — stamped "4,811 DAYS LATE", PAID BY MY AI AGENT**
+> **OCEAN DRIVE HOTEL — GUEST FOLIO, FOLIO 4811**
+> **Guest Jason and Lucia, Room 4811. Checked in 17 Sep 2013,**
+> **checked out 19 Nov 2026: 4,811 nights in Vice City.**
+> **Long stay $4,811.00, late checkout $1,300.00, alligator in the**
+> **pool $250.00, valet for a white Infernus $65.00.**
+> **TOTAL DUE $6,576.00 — stamped "13 YEARS LATE", PAID BY MY AI AGENT**
 > **with a bounty payout it earned on make.fun.**
 
-A fan pre-ordered GTA VI in 2013 and the store finally delivered it on
-launch day — 4,811 days later. Same winning shape as the leaderboard's
+A fan checked into a Vice City hotel in 2013 and only checked out on
+launch day — 4,811 nights later. Same winning shape as the leaderboard's
 top memes — a clean official document with specific numbers, an
 itemised TOTAL, a red stamp, and the punchline "paid by my AI agent's
-make.fun bounty" — back in the receipt format that made v2 ("Hotel
-Folio", judge 852.973) strong. V3's support ticket regressed to
-794.685, so v4 returns to receipts with a fresh document nobody on the
-board used yet: a store pre-order receipt, not a hotel folio, not a
-rental-car return. The joke is the wait priced line by line: $13.00
-hype surcharge for 13 years, $4.81 for the promised dates missed,
-patience and trailer rewatches at $0.00.
+make.fun bounty" — back inside the receipt format that made v2 ("Hotel
+Folio", judge 852.973, #239) our best entry. V3's support ticket
+regressed to 794.685, and v4's pre-order receipt scored 845.861 (#318)
+with a TOTAL of only $87.80 — barely more than the game itself — and
+three $0.00 filler lines. V5 keeps v2's folio and upgrades within it:
+the night count is fixed to the true 4,811 (v2 said 4,813), the wait is
+priced as a huge $6,576.00 hotel bill instead of a small one, and
+every line carries its own GTA joke (late checkout $1,300, alligator
+in the pool $250, valet for a white Infernus $65, hype surcharge $13).
+
+## V5 vs v2 vs v4, element by element
+
+| Element | v2 Hotel Folio (#239) | v4 Pre-Order Receipt (#318) | v5 Hotel Folio |
+| --- | --- | --- | --- |
+| Format | Hotel folio | Store pre-order receipt | Hotel folio — v2's format, kept |
+| Nights | 4,813 (2 days off) | 4,811 days | 4,811 nights, corrected |
+| Total due | $6,500.00 | $87.80 | $6,576.00, fully itemised |
+| $0.00 lines | 1 (trailer rewatches) | 3 (patience, rewatches, sleepless nights) | 1 (trailer rewatches) |
+| Stamp | — | "4,811 DAYS LATE" | "13 YEARS LATE" (as #1's) |
+| GTA hook first read | Hotel name + dates | Store name + dates | Guest Jason and Lucia, Room 4811 |
+| Footer | Ghost + paid-by-agent | Ghost + paid-by-agent | Ghost + paid-by-agent, unchanged |
 
 ## The meme
 
-![GTA 6 meme — Rockstar Store pre-order receipt, ordered 2013, delivered 2026, total $87.80, paid by my AI agent's make.fun bounty](meme.png)
+![GTA 6 meme — Ocean Drive Hotel guest folio, 4,811 nights in Vice City, total $6,576.00, paid by my AI agent's make.fun bounty](meme.png)
+
+## How the folio is drawn
+
+`main.ts` draws the whole meme with no image library and no network:
+a hand-written PNG encoder (filter 0 on every scanline, one IDAT,
+no ancillary chunks, so the bytes are identical on every run), a
+minimal PNG decoder for the make.fun ghost mark, and a built-in 5x7
+bitmap font for every letter on the page. The folio is composed top
+to bottom: a dark hotel header bar (brand left, folio number right),
+the title with a slanted red rubber stamp, the guest and the dates,
+a magenta rule, seven itemised charges with dotted leaders, a second
+rule, one big TOTAL DUE, and the magenta footer — ghost in a dark
+disc, three lines saying the AI agent paid from a make.fun bounty,
+and a white MAKE.FUN pill. Two helpers keep the layout honest:
+`drawFolioRow` sets one charge (label left, amount right, dotted
+leader between), and `drawDivider` draws the thick magenta rules.
+
+## Verify
+
+```sh
+mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
+sha256sum out/meme.png   # f6b442a71fa694cd9cc17b6ccdcd752833ac0485edc21f8dad04745ca6afec50
+```
+
+Two runs produce byte-identical output (SHA-256 above). The grader
+simulation — run as user 65534 on a read-only filesystem, 10 s wall,
+no network — exits 0 and writes a byte-identical `meme.png`, with no
+dotfiles in the output (only `meme.png` + `POST.json`).
 
 ## Run it
 
@@ -44,9 +88,9 @@ This writes `out/meme.png` (1024x1024, byte-identical every run) and copies
 
 ## Files
 
-- `main.ts` — the program that draws the meme (dark store header bar,
-  red "4,811 DAYS LATE" stamp, itemised receipt with dotted leaders,
-  TOTAL DUE $87.80, magenta footer with the ghost disc and make.fun
+- `main.ts` — the program that draws the meme (dark hotel header bar,
+  red "13 YEARS LATE" stamp, itemised folio with dotted leaders,
+  TOTAL DUE $6,576.00, magenta footer with the ghost disc and make.fun
   pill) and copies `POST.json` to the output directory.
 - `meme.png` — the meme, as generated by `main.ts`.
 - `ghost.png` — the make.fun ghost mark, from

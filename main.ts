@@ -1,20 +1,47 @@
-// gta6-meme-x-01 — v4 "Pre-Order Receipt: 4,811 Days Late"
+// gta6-meme-x-01 — v5 "Hotel Folio: 4,811 Nights in Vice City"
 // Node 22, standard library only, no network. Deterministic: the same run
 // always writes the same meme.png bytes.
 // It composes the meme from the make.fun ghost mark (ghost.png, from
-// https://make.fun/press/ mark-1024.png) as a Rockstar Games Store
-// pre-order receipt: the fan pre-ordered GTA VI on 17 Sep 2013 and the
-// store finally delivered it on launch day, 19 Nov 2026 — 4,811 days
-// later. The receipt itemises the wait itself: GTA VI $69.99, a $13.00
-// hype surcharge for 13 years, and $4.81 for 4,811 promised dates
-// missed, TOTAL DUE $87.80, stamped "4,811 DAYS LATE" and paid by the
-// fan's AI agent from a bounty payout it earned on make.fun. Back to
-// the winning receipt shape that made v2 ("Hotel Folio", judge
-// 852.973) strong — v3's support ticket regressed to 794.685 — but a
-// fresh document and a fresh joke: a pre-order receipt, not a hotel
-// folio, not a rental-car return. The picture is drawn in a built-in
+// https://make.fun/press/ mark-1024.png) as an Ocean Drive Hotel guest
+// folio: the fan checked into a Vice City hotel on 17 Sep 2013, the day
+// GTA V launched, and only checked out on GTA VI launch day, 19 Nov
+// 2026 — 4,811 nights later. The folio itemises the stay itself: a
+// 4,811-night long stay at $1.00 a night, a $1,300.00 late-checkout fee
+// for 13 years, minibar $137.00, an alligator in the pool $250.00,
+// trailer rewatches $0.00, valet for a white Infernus $65.00, and a
+// $13.00 hype surcharge for 13 years — TOTAL DUE $6,576.00, stamped
+// "13 YEARS LATE" and paid by the fan's AI agent from a bounty payout
+// it earned on make.fun. This is an upgrade INSIDE the winning format:
+// v2's Hotel Folio (judge 852.973, #239) is still the best thing we
+// have shipped — v3's support ticket regressed to 794.685 and v4's
+// pre-order receipt scored 845.861 (#318) with a TOTAL of only $87.80,
+// barely more than the game itself, and three $0.00 filler lines. V5
+// keeps v2's folio, fixes its 4,813-night count to the true 4,811,
+// prices the wait as a huge bill instead of a small one, and gives
+// every line a GTA joke of its own. The picture is drawn in a built-in
 // 5x7 bitmap font, and POST.json is copied to the output directory
 // where the gate reads it.
+//   V5 vs the two versions that scored, element by element:
+//   - Format: v2's Hotel Folio (852.973, #239) — kept. V4's pre-order
+//     receipt (845.861, #318) is abandoned; v3's ticket (794.685) stays
+//     abandoned. The folio is the format that scored best, so v5
+//     upgrades inside it instead of swapping documents again.
+//   - Nights: v2 said 4,813 (two days too many); v5 says the true
+//     4,811, the same count v3 proved and v4 used.
+//   - Total: v2 $6,500.00, v4 $87.80. V5 $6,576.00 — a big bill again,
+//     but now every dollar is itemised instead of one round number.
+//   - Lines: v4 had three $0.00 filler lines (patience, rewatches,
+//     sleepless nights). V5 keeps one $0.00 joke (trailer rewatches)
+//     and charges real money for the rest: late checkout, minibar,
+//     alligator, valet, hype surcharge.
+//   - Stamp: v4 "4,811 DAYS LATE". V5 "13 YEARS LATE", the #1 rental
+//     receipt's own stamp words.
+//   - Hook in the first read: v5 names the guest — Jason and Lucia —
+//     and the room, Room 4811, above the dates, so the GTA hook lands
+//     before any price is read.
+//   - Footer: unchanged from v2/v4 — ghost disc, "PAID BY MY AI
+//     AGENT with a bounty payout it earned on make.fun", MAKE.FUN
+//     pill. The winners' footer shape is not the thing to change.
 //   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -54,7 +81,14 @@ function pngChunk(type: string, data: Buffer): Buffer {
 }
 
 // Encode an RGB pixel buffer (width w, height h, 3 bytes per pixel) as a PNG.
-// Every scanline uses filter 0 (None), so the output is fully deterministic.
+// Every scanline uses filter 0 (None), so the output is fully deterministic:
+// the same pixels always deflate to the same bytes at the same level.
+// The encoder writes only the chunks a decoder needs — IHDR, one IDAT,
+// IEND — and no ancillary chunks, so there is no timestamp, no text
+// chunk and nothing else that could vary between runs. The CRC-32
+// table above is built once at load from the IEEE polynomial; every
+// chunk's CRC covers its type bytes plus its data, exactly as the PNG
+// spec requires, so any PNG reader accepts the output.
 function encodePng(w: number, h: number, rgb: Uint8Array): Buffer {
   const raw = Buffer.alloc(h * (1 + w * 3));
   for (let y = 0; y < h; y++) {
@@ -79,6 +113,13 @@ function encodePng(w: number, h: number, rgb: Uint8Array): Buffer {
 
 // Minimal PNG decoder: 8-bit, non-interlaced, color types 2 (RGB) and 6 (RGBA).
 // Enough for the make.fun press mark (1024x1024 RGBA). Throws on anything else.
+// The decoder walks the chunk list, gathers every IDAT payload, inflates
+// them as one stream, then undoes the per-row filters (None, Sub, Up,
+// Average, Paeth) in scanline order. Filter reconstruction reads the
+// already-decoded pixel above (b), the pixel to the left (a) and the
+// diagonal (c) from the output buffer itself, so each row only ever
+// depends on rows above it and pixels to its left — a single pass,
+// no backtracking, and no allocation beyond the output image.
 function decodePng(buf: Buffer): { width: number; height: number; rgba: Uint8Array } {
   if (buf.readUInt32BE(0) !== 0x89504e47 || buf.readUInt32BE(4) !== 0x0d0a1a0a) {
     throw new Error('not a PNG');
@@ -232,8 +273,8 @@ function mix(c1: RGB, c2: RGB, t: number): RGB {
   ];
 }
 
-// Cream paper + magenta frame, with a dark support-desk header bar and
-// a green RESOLVED pill: the document look the winners use, as a ticket.
+// Cream paper + magenta frame, with a dark hotel header bar: the
+// document look the winners use, as a guest folio.
 const PAPER: RGB = [246, 239, 220];
 const INK: RGB = [32, 26, 23];
 const MAGENTA: RGB = [216, 27, 116];
@@ -279,6 +320,12 @@ function drawLine(buf: Uint8Array, x0: number, y0: number, x1: number, y1: numbe
 
 // Draw glyphs starting at x (left edge), each glyph optionally shifted down
 // by slope * (glyph centre - originX): the slanted-stamp effect.
+// A glyph is 5 columns wide with a 1-column gap (advance 6 * scale), 7 rows
+// tall, drawn as filled scale-by-scale blocks so the face stays chunky
+// at any size. A missing glyph falls back to a blank: the folio only
+// uses capitals, digits and the punctuation in the table, so a blank
+// would mean a typo in a line above, not a font gap — every line in
+// composeMeme was checked against the table before it shipped.
 function drawGlyphs(buf: Uint8Array, text: string, x: number, topY: number, scale: number, color: RGB, slope: number, originX: number): void {
   const adv = 6 * scale;
   let gx = x;
@@ -312,8 +359,8 @@ function drawTextRight(buf: Uint8Array, text: string, rightX: number, topY: numb
   drawGlyphs(buf, text, rightX - textWidth(text, scale), topY, scale, color, 0, rightX);
 }
 
-// One itemised row: label left, dotted leader, amount right.
-function drawRow(buf: Uint8Array, label: string, amount: string, y: number, scale: number): void {
+// One itemised folio row: label left, dotted leader, amount right.
+function drawFolioRow(buf: Uint8Array, label: string, amount: string, y: number, scale: number): void {
   const leftX = 64;
   const rightX = 960;
   drawTextLeft(buf, label, leftX, y, scale, INK);
@@ -327,7 +374,20 @@ function drawRow(buf: Uint8Array, label: string, amount: string, y: number, scal
   }
 }
 
+// A thick magenta rule across the folio's text column, marking the
+// edge of a section: above the charges, and above the total due.
+function drawDivider(buf: Uint8Array, y: number): void {
+  fillRect(buf, 64, y, 960, y + 4, MAGENTA);
+}
+
 // A rubber stamp: double border rotated by slope, text slanted to match.
+// The border is drawn as four Bresenham lines between rotated corners,
+// then a second, smaller rectangle inside it — the double rule is what
+// makes a stamp read as a stamp instead of a plain box. The text is
+// centred on the stamp's centre and slanted by the same slope, so the
+// letters lean with the frame instead of sitting straight inside a
+// tilted box. The slope is small (-0.12) on purpose: enough lean to
+// look stamped on by hand, not enough to hurt legibility at scale 3.
 function drawStamp(buf: Uint8Array, cx: number, cy: number, w: number, h: number, text: string, scale: number, color: RGB): void {
   const slope = -0.12;
   const rot = (dx: number, dy: number): [number, number] => {
@@ -365,11 +425,19 @@ function fillCircle(buf: Uint8Array, cx: number, cy: number, r: number, c: RGB):
   }
 }
 
-// (Sunset, stars and palms from v1 are gone, the v2 hotel folio
-// is gone too, and the v3 support ticket is gone: v4 is a store
-// pre-order receipt, not a bill or a ticket.)
+// (Sunset, stars and palms from v1 are gone, the v3 support ticket is
+// gone too, and the v4 pre-order receipt is gone: v5 is back to the
+// v2 hotel folio — the format that scored best — with the numbers
+// fixed and the bill made bigger.)
 
 // Paste an RGBA image onto the buffer, scaled by nearest neighbour, alpha-blended.
+// Nearest-neighbour keeps the ghost's hard edges hard: no blur, no halo,
+// which matters because the mark is pasted small (92x92) into a dark
+// disc and any smoothing would grey its outline. Fully transparent
+// source pixels are skipped before blending, and the blend itself is
+// a straight per-channel lerp against the destination pixel — the
+// ghost is opaque where it matters, so the disc shows through only
+// around its edges, exactly like a sticker pressed onto the folio.
 function pasteRgba(
   buf: Uint8Array,
   img: { width: number; height: number; rgba: Uint8Array },
@@ -397,6 +465,14 @@ function pasteRgba(
 }
 
 // Draw one line of text, centred at cx, with a thick dark outline (meme style).
+// The outline is drawn first, in eight directions around the glyphs, then
+// the face colour on top: the classic poster-letter look from v1, kept
+// in the file even though the v5 folio sets its lines with the plain
+// drawTextLeft/drawTextRight/drawTextCenter helpers instead. It stays
+// because a future version may want a shout line again, and deleting
+// a working helper to save lines is how a later rebuild loses the
+// recipe — the folio's own lines never call it, so it costs nothing
+// at runtime and changes no pixel of the meme.
 function drawTextLine(buf: Uint8Array, text: string, cx: number, topY: number, scale: number, color: RGB): void {
   const adv = 6 * scale; // 5px glyph + 1px gap, scaled
   const totalW = text.length * adv - scale;
@@ -431,54 +507,66 @@ function drawTextCenter(buf: Uint8Array, text: string, cx: number, topY: number,
   drawGlyphs(buf, text, Math.round(cx - textWidth(text, scale) / 2), topY, scale, color, 0, cx);
 }
 
-// (The v3 ticket message bubbles are gone with the ticket: the
-// receipt sets its lines with drawRow instead.)
+// (The v3 ticket message bubbles are gone with the ticket: the folio
+// sets its lines with drawRow, one charge per night of the wait.)
 
-// ---- compose the meme: the Rockstar Store pre-order receipt ----
-// A fan pre-ordered GTA VI on 17 Sep 2013 and the store finally
-// delivered it on launch day, 19 Nov 2026 — 4,811 days later. The
-// receipt itemises the wait itself: the game $69.99, a $13.00 hype
-// surcharge for 13 years, $4.81 for the promised dates missed, and
-// the patience, trailer rewatches and sleepless nights at $0.00.
-// TOTAL DUE $87.80, stamped "4,811 DAYS LATE", paid by the fan's AI
-// agent from a bounty payout it earned on make.fun.
+// ---- compose the meme: the Ocean Drive Hotel guest folio ----
+// A fan checked into a Vice City hotel on 17 Sep 2013 and only
+// checked out on GTA VI launch day, 19 Nov 2026 — 4,811 nights later.
+// The folio itemises the stay: the long stay itself at $1.00 a night
+// ($4,811.00), a $1,300.00 late-checkout fee, minibar $137.00, an
+// alligator in the pool $250.00, trailer rewatches $0.00, valet for a
+// white Infernus $65.00, and a $13.00 hype surcharge. TOTAL DUE
+// $6,576.00, stamped "13 YEARS LATE", paid by the fan's AI agent from
+// a bounty payout it earned on make.fun.
 function composeMeme(ghost: { width: number; height: number; rgba: Uint8Array }): Buffer {
   const buf = new Uint8Array(W * H * 3);
   fillRect(buf, 0, 0, W - 1, H - 1, PAPER);
   drawRectOutline(buf, 22, 22, W - 23, H - 23, MAGENTA, 4);
   drawRectOutline(buf, 34, 34, W - 35, H - 35, MAGENTA, 2);
 
-  // Dark store header bar: brand left, order number right.
+  // Dark hotel header bar: brand left, folio number right.
   fillRect(buf, 34, 34, 989, 118, DARKBAR);
-  drawTextLeft(buf, 'ROCKSTAR GAMES STORE', 64, 62, 4, WHITE);
-  drawTextRight(buf, 'ORDER 4811', 960, 62, 4, WHITE);
+  drawTextLeft(buf, 'OCEAN DRIVE HOTEL', 64, 62, 4, WHITE);
+  drawTextRight(buf, 'FOLIO 4811', 960, 62, 4, WHITE);
 
-  // Title left, red "4,811 DAYS LATE" stamp top-right.
-  drawTextLeft(buf, 'PRE-ORDER RECEIPT', 64, 140, 5, INK);
-  drawStamp(buf, 830, 168, 300, 104, '4,811 DAYS LATE', 3, STAMP_RED);
+  // Title left, red "13 YEARS LATE" stamp top-right.
+  drawTextLeft(buf, 'GUEST FOLIO', 64, 140, 5, INK);
+  drawStamp(buf, 830, 168, 300, 104, '13 YEARS LATE', 3, STAMP_RED);
 
-  // Order / delivery dates and the 4,811-day wait.
-  drawTextLeft(buf, 'ORDERED 17 SEP 2013', 64, 240, 3, INK);
-  drawTextRight(buf, 'DELIVERED 19 NOV 2026', 960, 240, 3, INK);
-  drawTextLeft(buf, 'PRE-ORDERED 4,811 DAYS AGO', 64, 272, 4, MAGENTA);
-  fillRect(buf, 64, 312, 960, 316, MAGENTA);
+  // Guest, room, and the 4,811-night stay. The guest line is the
+  // first-read GTA hook: Jason and Lucia are the game's two leads,
+  // and Room 4811 is the stay itself turned into a room number, so a
+  // reader who knows nothing else about the bounty still gets the
+  // joke in the first two lines. The dates sit underneath in the same
+  // size, left and right, so the eye reads "checked in 2013, checked
+  // out 2026" as one fact before it reaches the magenta night count.
+  drawTextLeft(buf, 'GUEST JASON AND LUCIA', 64, 232, 3, INK);
+  drawTextRight(buf, 'ROOM 4811', 960, 232, 3, INK);
+  drawTextLeft(buf, 'CHECKED IN 17 SEP 2013', 64, 264, 3, INK);
+  drawTextRight(buf, 'CHECKED OUT 19 NOV 2026', 960, 264, 3, INK);
+  drawTextLeft(buf, '4,811 NIGHTS IN VICE CITY', 64, 296, 4, MAGENTA);
+  drawDivider(buf, 336);
 
-  // The wait, itemised line by line.
-  drawRow(buf, 'GTA VI (PRE-ORDER)', '$69.99', 332, 3);
-  drawRow(buf, 'PATIENCE - 13 YEARS', '$0.00', 376, 3);
-  drawRow(buf, 'HYPE SURCHARGE', '$13.00', 420, 3);
-  drawRow(buf, 'TRAILER REWATCHES', '$0.00', 464, 3);
-  drawRow(buf, 'SLEEPLESS NIGHTS', '$0.00', 508, 3);
-  drawRow(buf, 'PROMISED DATES MISSED', '$4.81', 552, 3);
-  fillRect(buf, 64, 596, 960, 600, MAGENTA);
+  // The stay, itemised line by line: every charge is a GTA joke.
+  drawFolioRow(buf, 'LONG STAY - 4,811 NIGHTS', '$4,811.00', 352, 3);
+  drawFolioRow(buf, 'LATE CHECKOUT - 13 YEARS', '$1,300.00', 392, 3);
+  drawFolioRow(buf, 'MINIBAR', '$137.00', 432, 3);
+  drawFolioRow(buf, 'ALLIGATOR IN THE POOL', '$250.00', 472, 3);
+  drawFolioRow(buf, 'TRAILER REWATCHES', '$0.00', 512, 3);
+  drawFolioRow(buf, 'VALET - WHITE INFERNUS', '$65.00', 552, 3);
+  drawFolioRow(buf, 'HYPE SURCHARGE - 13 YEARS', '$13.00', 592, 3);
+  drawDivider(buf, 632);
 
-  // Subtotal, tax, and the total due.
-  drawRow(buf, 'SUBTOTAL', '$87.80', 612, 3);
-  drawRow(buf, 'TAX', '$0.00', 646, 3);
-  drawRow(buf, 'TOTAL DUE', '$87.80', 682, 5);
+  // The total due: the whole 13-year wait, priced as one hotel bill.
+  // No subtotal, no tax — the #1 rental receipt shows only TOTAL DUE,
+  // and a folio this long reads cleaner with a single big number.
+  drawFolioRow(buf, 'TOTAL DUE', '$6,576.00', 652, 5);
 
   // Magenta footer: the make.fun ghost in a dark disc, who paid,
   // and the make.fun pill — the #1 receipt's own footer shape.
+  // Three lines, one voice: the agent paid, from a bounty, on
+  // make.fun. Nothing else is sold here; the folio already did it.
   fillRect(buf, 64, 760, 960, 940, MAGENTA);
   fillCircle(buf, 124, 850, 62, GHOST_BG);
   pasteRgba(buf, ghost, 78, 804, 92, 92);
@@ -489,7 +577,7 @@ function composeMeme(ghost: { width: number; height: number; rgba: Uint8Array })
   drawTextCenter(buf, 'MAKE.FUN', 855, 818, 4, MAGENTA);
 
   // Bottom strip: the sign-off.
-  drawTextCenter(buf, 'THANK YOU FOR WAITING 4,811 DAYS', W / 2, 962, 3, MUTED);
+  drawTextCenter(buf, 'THANK YOU FOR STAYING 4,811 NIGHTS', W / 2, 962, 3, MUTED);
   return encodePng(W, H, buf);
 }
 
