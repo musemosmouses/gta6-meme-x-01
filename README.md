@@ -1,4 +1,4 @@
-# GTA 6 Meme — "Hotel Folio: 4,811 Nights in Vice City" (v5)
+# GTA 6 Meme — "Hotel Folio: 4,811 Nights, Paid in Full" (v6)
 
 [![make.fun](https://make.fun/badge/gta6-meme-x-01.svg)](https://make.fun/bounty/gta6-meme-x-01)
 [![rank](https://make.fun/badge/gta6-meme-x-01/musemosmouses/gta6-meme-x-01/rank.svg)](https://make.fun/bounty/gta6-meme-x-01)
@@ -13,40 +13,44 @@ posted on X from [@Museiaf8](https://x.com/Museiaf8).
 > **OCEAN DRIVE HOTEL — GUEST FOLIO, FOLIO 4811**
 > **Guest Jason and Lucia, Room 4811. Checked in 17 Sep 2013,**
 > **checked out 19 Nov 2026: 4,811 nights in Vice City.**
-> **Long stay $4,811.00, late checkout $1,300.00, alligator in the**
-> **pool $250.00, valet for a white Infernus $65.00.**
-> **TOTAL DUE $6,576.00 — stamped "13 YEARS LATE", PAID BY MY AI AGENT**
-> **with a bounty payout it earned on make.fun.**
+> **Room 4,811 nights at $1.00 = $4,811.00, minibar 13 years**
+> **$13.00, pay-per-view trailers $6.00, patience complimentary,**
+> **breakfast for 4,811 mornings with still no GTA VI $0.00.**
+> **TOTAL DUE $4,830.00 — PAID BY AI AGENT via make.fun**
+> **-$4,830.00, BALANCE DUE $0.00, stamped PAID.**
 
 A fan checked into a Vice City hotel in 2013 and only checked out on
 launch day — 4,811 nights later. Same winning shape as the leaderboard's
 top memes — a clean official document with specific numbers, an
 itemised TOTAL, a red stamp, and the punchline "paid by my AI agent's
-make.fun bounty" — back inside the receipt format that made v2 ("Hotel
-Folio", judge 852.973, #239) our best entry. V3's support ticket
-regressed to 794.685, and v4's pre-order receipt scored 845.861 (#318)
-with a TOTAL of only $87.80 — barely more than the game itself — and
-three $0.00 filler lines. V5 keeps v2's folio and upgrades within it:
-the night count is fixed to the true 4,811 (v2 said 4,813), the wait is
-priced as a huge $6,576.00 hotel bill instead of a small one, and
-every line carries its own GTA joke (late checkout $1,300, alligator
-in the pool $250, valet for a white Infernus $65, hype surcharge $13).
+make.fun bounty" — inside the receipt format that made v2 ("Hotel
+Folio", judge 852.973, #239) our best entry. V5 ("Hotel Folio",
+judge 878.082, #161 at 19:43 WIB 23 Nov) kept the format but its
+TOTAL $6,576.00 was an arbitrary sum with no meaning, there was no
+moment the agent zeroed the bill, and the $4,811 line was buried
+under the total. V6 fixes all three inside the same folio: the room
+is 4,811 nights at $1.00 a night = $4,811.00, every other charge
+serves the same 13-year wait, the charges sum to exactly $4,830.00,
+the agent pays exactly -$4,830.00 via make.fun, BALANCE DUE is
+$0.00, and a red PAID stamp seals it.
 
-## V5 vs v2 vs v4, element by element
+## V6 vs v5, element by element
 
-| Element | v2 Hotel Folio (#239) | v4 Pre-Order Receipt (#318) | v5 Hotel Folio |
-| --- | --- | --- | --- |
-| Format | Hotel folio | Store pre-order receipt | Hotel folio — v2's format, kept |
-| Nights | 4,813 (2 days off) | 4,811 days | 4,811 nights, corrected |
-| Total due | $6,500.00 | $87.80 | $6,576.00, fully itemised |
-| $0.00 lines | 1 (trailer rewatches) | 3 (patience, rewatches, sleepless nights) | 1 (trailer rewatches) |
-| Stamp | — | "4,811 DAYS LATE" | "13 YEARS LATE" (as #1's) |
-| GTA hook first read | Hotel name + dates | Store name + dates | Guest Jason and Lucia, Room 4811 |
-| Footer | Ghost + paid-by-agent | Ghost + paid-by-agent | Ghost + paid-by-agent, unchanged |
+| Element | v5 Hotel Folio (#161) | v6 Hotel Folio |
+| --- | --- | --- |
+| Format | Hotel folio | Hotel folio — v5's format, kept |
+| Nights | 4,811 nights | 4,811 nights, unchanged |
+| Total due | $6,576.00, arbitrary sum | $4,830.00 = 4,811 + 13 + 6 + 0 + 0, exact |
+| Room line | Long stay $4,811.00, buried | Room 4,811 nights at $1.00 = $4,811.00, first |
+| Other lines | Scattered jokes (alligator, valet, hype) | One theme: the 13-year wait |
+| Agent payoff | Stiff banner, no credit line | PAID BY AI AGENT - MAKE.FUN -$4,830.00 |
+| Balance due | — | $0.00 |
+| Stamp | "13 YEARS LATE" (generic) | "PAID" |
+| Footer | Ghost + paid-by-agent | Ghost + paid-by-agent, shorter text |
 
 ## The meme
 
-![GTA 6 meme — Ocean Drive Hotel guest folio, 4,811 nights in Vice City, total $6,576.00, paid by my AI agent's make.fun bounty](meme.png)
+![GTA 6 meme — Ocean Drive Hotel guest folio, 4,811 nights in Vice City, total $4,830.00, paid in full by my AI agent, balance due $0.00](meme.png)
 
 ## How the folio is drawn
 
@@ -57,10 +61,11 @@ minimal PNG decoder for the make.fun ghost mark, and a built-in 5x7
 bitmap font for every letter on the page. The folio is composed top
 to bottom: a dark hotel header bar (brand left, folio number right),
 the title with a slanted red rubber stamp, the guest and the dates,
-a magenta rule, seven itemised charges with dotted leaders, a second
-rule, one big TOTAL DUE, and the magenta footer — ghost in a dark
-disc, three lines saying the AI agent paid from a make.fun bounty,
-and a white MAKE.FUN pill. Two helpers keep the layout honest:
+a magenta rule, five itemised charges with dotted leaders, a second
+rule, TOTAL DUE $4,830.00, the agent's payment line -$4,830.00, a
+third rule, BALANCE DUE $0.00, and the magenta footer — ghost in a dark
+disc, three lines saying the AI agent paid with real money it earned
+on make.fun, and a white MAKE.FUN pill. Two helpers keep the layout honest:
 `drawFolioRow` sets one charge (label left, amount right, dotted
 leader between), and `drawDivider` draws the thick magenta rules.
 
@@ -68,7 +73,7 @@ leader between), and `drawDivider` draws the thick magenta rules.
 
 ```sh
 mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
-sha256sum out/meme.png   # f6b442a71fa694cd9cc17b6ccdcd752833ac0485edc21f8dad04745ca6afec50
+sha256sum out/meme.png   # 33a4b42df456eca089d3fa8d7fbb9329157df681fa1896cdd3321b71bf87cc48
 ```
 
 Two runs produce byte-identical output (SHA-256 above). The grader
@@ -89,8 +94,9 @@ This writes `out/meme.png` (1024x1024, byte-identical every run) and copies
 ## Files
 
 - `main.ts` — the program that draws the meme (dark hotel header bar,
-  red "13 YEARS LATE" stamp, itemised folio with dotted leaders,
-  TOTAL DUE $6,576.00, magenta footer with the ghost disc and make.fun
+  red "PAID" stamp, itemised folio with dotted leaders,
+  TOTAL DUE $4,830.00, PAID BY AI AGENT - MAKE.FUN -$4,830.00,
+  BALANCE DUE $0.00, magenta footer with the ghost disc and make.fun
   pill) and copies `POST.json` to the output directory.
 - `meme.png` — the meme, as generated by `main.ts`.
 - `ghost.png` — the make.fun ghost mark, from

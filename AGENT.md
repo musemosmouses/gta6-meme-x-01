@@ -2,32 +2,58 @@
 
 Entry for make.fun bounty "Post a GTA 6 meme on X" ($500, top 50).
 
-## The meme (v5 — resubmit, 23 Nov 2026)
+## The meme (v6 — resubmit, 23 Nov 2026)
 
 "OCEAN DRIVE HOTEL — GUEST FOLIO, FOLIO 4811. Guest Jason and Lucia,
 Room 4811. Checked in 17 Sep 2013, checked out 19 Nov 2026: 4,811
-nights in Vice City. Long stay $4,811.00, late checkout $1,300.00,
-minibar $137.00, alligator in the pool $250.00, trailer rewatches
-$0.00, valet for a white Infernus $65.00, hype surcharge $13.00.
-TOTAL DUE $6,576.00 — stamped '13 YEARS LATE', PAID BY MY AI AGENT
-with a bounty payout it earned on make.fun."
-The live v4 ("Pre-Order Receipt", judge 845.861, #318/4217) sits below
-v2 ("Hotel Folio", judge 852.973, #239) — v4's TOTAL was only $87.80,
-barely more than the game, with three $0.00 filler lines. Per Zoya's
-rule (22 Nov 21:33 WIB) v5 upgrades WITHIN v2's winning folio format
-instead of abandoning it: same document, night count fixed 4,813 →
-4,811, bill grown to $6,576.00, every line its own GTA joke, stamp
-now "13 YEARS LATE" like the #1 rental receipt's. Money line (top 50)
-is 889.012; top 3 are all receipts (~903.832). Target: beat v2's
-852.973 and close on the 889k money line. Deadline 23 Nov 21:00 WIB.
-Quota: fresh UTC day, 5/5 left, 4 entries kept of 10 total.
+nights in Vice City. Room 4,811 nights at $1.00 = $4,811.00, minibar
+13 years $13.00, pay-per-view trailers $6.00, patience complimentary
+$0.00, breakfast for 4,811 mornings with still no GTA VI $0.00.
+TOTAL DUE $4,830.00 — PAID BY AI AGENT via make.fun -$4,830.00,
+BALANCE DUE $0.00, stamped PAID."
+The live v5 ("Hotel Folio", judge 878.082, #161 at 19:43 WIB 23 Nov)
+kept the format but its TOTAL $6,576.00 was an arbitrary sum with no
+meaning, there was no moment the agent zeroed the bill, and the
+$4,811 line was buried under the total. Per Zoya's rule (22 Nov
+21:33 WIB, reaffirmed 23 Nov 11:32 WIB) v6 upgrades WITHIN the folio
+format instead of abandoning it — and only after a direct visual
+read of the live leaderboard (v5 + #1, #2, #11, #51, #55): the
+leaders' totals ARE the punchline (4,811 days = $4,811; $0.00 due),
+every line serves one theme, and the agent zeroes the bill. Money
+line (top 50) is 893.303; top 1 is 914.085. Target: beat 893.303 and
+close on the leaders. Deadline 23 Nov 21:00 WIB. Quota: fresh UTC
+day, 5/5 left at 15:00 check, v6 is within quota.
 
-Element-by-element vs the live versions: format — v2's folio kept,
-v4's receipt dropped; nights — 4,813 → 4,811 corrected; total —
-$87.80 → $6,576.00, fully itemised; $0.00 lines — 3 → 1; stamp —
-"4,811 DAYS LATE" → "13 YEARS LATE"; first-read hook — guest Jason
-and Lucia + Room 4811 added above the dates; footer — ghost disc +
-paid-by-agent + MAKE.FUN pill, unchanged from v2/v4.
+Element-by-element vs v5: format — folio kept; total — $6,576.00
+arbitrary → $4,830.00 exact (4,811 + 13 + 6 + 0 + 0, calculator
+verified); room line — buried → first, "ROOM - 4,811 NIGHTS AT
+$1.00"; lines — scattered jokes → one theme (the 13-year wait);
+payoff — stiff banner only → credit line -$4,830.00 + BALANCE DUE
+$0.00 + PAID stamp; stamp — "13 YEARS LATE" → "PAID"; footer —
+ghost disc + paid-by-agent + MAKE.FUN pill, text shortened to
+"PAID BY MY AI AGENT / WITH REAL MONEY IT / EARNED ON MAKE.FUN";
+sign-off — "THANK YOU FOR WAITING 13 YEARS - GTA VI IS HERE."
+
+## Build report (v6, 23 Nov 2026, agent d4da01de-6fcf-481e-9e82-3831e1444a86)
+
+- `meme.png`: 1024x1024, 16,008 B, SHA-256
+  33a4b42df456eca089d3fa8d7fbb9329157df681fa1896cdd3321b71bf87cc48.
+  Two runs byte-identical; visual check done by the builder: every
+  number legible, no overlaps, PAID stamp clear of the title and the
+  dates, ghost + MAKE.FUN pill clean in the magenta footer.
+  Arithmetic verified by calculator before render: 4,811 + 13 + 6 +
+  0 + 0 = 4,830; paid -4,830; balance 0.00.
+- Hermes evaluation was started but killed mid-run: the parent's
+  direct visual dissection of the 6 live images superseded it and
+  fully specified the v6 recipe. No 100milionseek fallback was
+  needed — Hermes was alive, just slow.
+- POST.json still names the v5 post
+  (https://x.com/Museiaf8/status/2124673972315017584) — the parent
+  must post v6 on X first, then update POST.json via an Edit in a
+  recorded session, re-upload, and submit before 21:00 WIB.
+- Bundle + check: parent re-bundles after this session (usage rows
+  appear only on completion) — see HANDOFF.md v5 finisher notes for
+  the proven --parent-session pattern (deb822ff + 5500cac1).
 
 ## Build report (v5, 23 Nov 2026, agent 59ae2b46-15bf-4991-9f4d-738ac8fe83aa)
 

@@ -1,47 +1,49 @@
-// gta6-meme-x-01 — v5 "Hotel Folio: 4,811 Nights in Vice City"
+// gta6-meme-x-01 — v6 "Hotel Folio: 4,811 Nights, Paid in Full"
 // Node 22, standard library only, no network. Deterministic: the same run
 // always writes the same meme.png bytes.
 // It composes the meme from the make.fun ghost mark (ghost.png, from
 // https://make.fun/press/ mark-1024.png) as an Ocean Drive Hotel guest
 // folio: the fan checked into a Vice City hotel on 17 Sep 2013, the day
 // GTA V launched, and only checked out on GTA VI launch day, 19 Nov
-// 2026 — 4,811 nights later. The folio itemises the stay itself: a
-// 4,811-night long stay at $1.00 a night, a $1,300.00 late-checkout fee
-// for 13 years, minibar $137.00, an alligator in the pool $250.00,
-// trailer rewatches $0.00, valet for a white Infernus $65.00, and a
-// $13.00 hype surcharge for 13 years — TOTAL DUE $6,576.00, stamped
-// "13 YEARS LATE" and paid by the fan's AI agent from a bounty payout
-// it earned on make.fun. This is an upgrade INSIDE the winning format:
-// v2's Hotel Folio (judge 852.973, #239) is still the best thing we
-// have shipped — v3's support ticket regressed to 794.685 and v4's
-// pre-order receipt scored 845.861 (#318) with a TOTAL of only $87.80,
-// barely more than the game itself, and three $0.00 filler lines. V5
-// keeps v2's folio, fixes its 4,813-night count to the true 4,811,
-// prices the wait as a huge bill instead of a small one, and gives
-// every line a GTA joke of its own. The picture is drawn in a built-in
-// 5x7 bitmap font, and POST.json is copied to the output directory
-// where the gate reads it.
-//   V5 vs the two versions that scored, element by element:
-//   - Format: v2's Hotel Folio (852.973, #239) — kept. V4's pre-order
-//     receipt (845.861, #318) is abandoned; v3's ticket (794.685) stays
-//     abandoned. The folio is the format that scored best, so v5
-//     upgrades inside it instead of swapping documents again.
-//   - Nights: v2 said 4,813 (two days too many); v5 says the true
-//     4,811, the same count v3 proved and v4 used.
-//   - Total: v2 $6,500.00, v4 $87.80. V5 $6,576.00 — a big bill again,
-//     but now every dollar is itemised instead of one round number.
-//   - Lines: v4 had three $0.00 filler lines (patience, rewatches,
-//     sleepless nights). V5 keeps one $0.00 joke (trailer rewatches)
-//     and charges real money for the rest: late checkout, minibar,
-//     alligator, valet, hype surcharge.
-//   - Stamp: v4 "4,811 DAYS LATE". V5 "13 YEARS LATE", the #1 rental
-//     receipt's own stamp words.
-//   - Hook in the first read: v5 names the guest — Jason and Lucia —
-//     and the room, Room 4811, above the dates, so the GTA hook lands
-//     before any price is read.
-//   - Footer: unchanged from v2/v4 — ghost disc, "PAID BY MY AI
-//     AGENT with a bounty payout it earned on make.fun", MAKE.FUN
-//     pill. The winners' footer shape is not the thing to change.
+// 2026 — 4,811 nights later. V6 keeps v5's Hotel Folio format (the
+// format that carried v2 to #239 and v5 to #134) and fixes what the
+// visual dissection of the live leaderboard found wrong with v5:
+// v5's TOTAL $6,576.00 was an arbitrary sum with no meaning, there
+// was no moment the agent zeroed the bill, and the $4,811 line was
+// buried under the total. V6 makes the total the punchline: the room
+// is 4,811 nights at $1.00 a night = $4,811.00, every other charge
+// serves the same 13-year wait (minibar $13.00, pay-per-view $6.00,
+// patience complimentary, breakfast for 4,811 mornings with still no
+// GTA VI $0.00), the charges sum to exactly $4,830.00, the agent
+// pays exactly -$4,830.00 via make.fun, BALANCE DUE is $0.00, and a
+// red PAID stamp seals it. The picture is drawn in a built-in 5x7
+// bitmap font, and POST.json is copied to the output directory where
+// the gate reads it.
+//   V6 vs v5 (judge 878.082, #161 at 19:43 WIB 23 Nov), element by
+//   element — every change comes from a direct visual read of the
+//   live leaderboard (v5 + #1, #2, #11, #51, #55):
+//   - Format: v5's Hotel Folio kept — it carried v2 to #239 and v5
+//     to #134. Only the numbers and the payoff change.
+//   - Total: v5 $6,576.00 was an arbitrary sum (4811+1300+137+250+
+//     0+65+13) with no meaning. V6 $4,830.00 = 4811 + 13 + 6 + 0 + 0,
+//     every dollar from the wait itself, verified by calculator.
+//   - The $4,811 line: v5 buried it under the total. V6 makes it the
+//     first charge, "ROOM - 4,811 NIGHTS AT $1.00", so the eye lands
+//     on the symmetry first: 4,811 nights = $4,811.00.
+//   - Scattered lines: v5's alligator $250, valet $65 and trailer $0
+//     each told a different joke. V6's lines all serve one theme,
+//     waiting 13 years: minibar, pay-per-view trailers, patience,
+//     breakfast for 4,811 mornings with still no GTA VI.
+//   - The payoff: v5's banner "PAID BY MY AI AGENT WITH A BOUNTY
+//     PAYOUT IT EARNED ON MAKE.FUN" was stiff, with no credit line,
+//     no $0.00 balance, no PAID stamp. V6 shows the agent zeroing
+//     the bill like every leader does: "PAID BY AI AGENT - MAKE.FUN
+//     -$4,830.00", BALANCE DUE $0.00, red PAID stamp.
+//   - Stamp: v5 "13 YEARS LATE" was generic. V6 "PAID" — the
+//     specific twist the leaders use.
+//   - Footer: "THANK YOU FOR WAITING 13 YEARS - GTA VI IS HERE."
+//     The folio already did the selling; the sign-off says the wait
+//     is over.
 //   mkdir -p out && MAKEFUN_BOT_DIR=. MAKEFUN_OUTPUT_DIR=out node main.ts
 
 import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -513,12 +515,13 @@ function drawTextCenter(buf: Uint8Array, text: string, cx: number, topY: number,
 // ---- compose the meme: the Ocean Drive Hotel guest folio ----
 // A fan checked into a Vice City hotel on 17 Sep 2013 and only
 // checked out on GTA VI launch day, 19 Nov 2026 — 4,811 nights later.
-// The folio itemises the stay: the long stay itself at $1.00 a night
-// ($4,811.00), a $1,300.00 late-checkout fee, minibar $137.00, an
-// alligator in the pool $250.00, trailer rewatches $0.00, valet for a
-// white Infernus $65.00, and a $13.00 hype surcharge. TOTAL DUE
-// $6,576.00, stamped "13 YEARS LATE", paid by the fan's AI agent from
-// a bounty payout it earned on make.fun.
+// The folio itemises the wait: the room itself, 4,811 nights at
+// $1.00 a night ($4,811.00), minibar for 13 years $13.00,
+// pay-per-view trailers $6.00, patience complimentary $0.00, and
+// breakfast for 4,811 mornings with still no GTA VI $0.00. TOTAL DUE
+// $4,830.00 (4,811 + 13 + 6 + 0 + 0, verified by calculator), the
+// agent pays exactly -$4,830.00 via make.fun, BALANCE DUE $0.00,
+// stamped PAID in red.
 function composeMeme(ghost: { width: number; height: number; rgba: Uint8Array }): Buffer {
   const buf = new Uint8Array(W * H * 3);
   fillRect(buf, 0, 0, W - 1, H - 1, PAPER);
@@ -530,9 +533,10 @@ function composeMeme(ghost: { width: number; height: number; rgba: Uint8Array })
   drawTextLeft(buf, 'OCEAN DRIVE HOTEL', 64, 62, 4, WHITE);
   drawTextRight(buf, 'FOLIO 4811', 960, 62, 4, WHITE);
 
-  // Title left, red "13 YEARS LATE" stamp top-right.
+  // Title left, red "PAID" stamp top-right: the payoff the
+  // leaders show — the bill is not just late, it is settled.
   drawTextLeft(buf, 'GUEST FOLIO', 64, 140, 5, INK);
-  drawStamp(buf, 830, 168, 300, 104, '13 YEARS LATE', 3, STAMP_RED);
+  drawStamp(buf, 830, 168, 190, 96, 'PAID', 3, STAMP_RED);
 
   // Guest, room, and the 4,811-night stay. The guest line is the
   // first-read GTA hook: Jason and Lucia are the game's two leads,
@@ -548,36 +552,46 @@ function composeMeme(ghost: { width: number; height: number; rgba: Uint8Array })
   drawTextLeft(buf, '4,811 NIGHTS IN VICE CITY', 64, 296, 4, MAGENTA);
   drawDivider(buf, 336);
 
-  // The stay, itemised line by line: every charge is a GTA joke.
-  drawFolioRow(buf, 'LONG STAY - 4,811 NIGHTS', '$4,811.00', 352, 3);
-  drawFolioRow(buf, 'LATE CHECKOUT - 13 YEARS', '$1,300.00', 392, 3);
-  drawFolioRow(buf, 'MINIBAR', '$137.00', 432, 3);
-  drawFolioRow(buf, 'ALLIGATOR IN THE POOL', '$250.00', 472, 3);
-  drawFolioRow(buf, 'TRAILER REWATCHES', '$0.00', 512, 3);
-  drawFolioRow(buf, 'VALET - WHITE INFERNUS', '$65.00', 552, 3);
-  drawFolioRow(buf, 'HYPE SURCHARGE - 13 YEARS', '$13.00', 592, 3);
-  drawDivider(buf, 632);
+  // The wait, itemised line by line: every charge serves the same
+  // 13-year wait, and the arithmetic is exact — 4,811 + 13 + 6 + 0
+  // + 0 = 4,830, verified by calculator before this shipped. The
+  // room line leads because it IS the symmetry: 4,811 nights at
+  // $1.00 a night is $4,811.00. The breakfast line is the one
+  // original twist over the #55 folio's frame: 4,811 mornings of
+  // breakfast, still no GTA VI, $0.00.
+  drawFolioRow(buf, 'ROOM - 4,811 NIGHTS AT $1.00', '$4,811.00', 352, 3);
+  drawFolioRow(buf, 'MINIBAR - 13 YEARS', '$13.00', 392, 3);
+  drawFolioRow(buf, 'PAY-PER-VIEW - TRAILERS', '$6.00', 432, 3);
+  drawFolioRow(buf, 'PATIENCE - COMPLIMENTARY', '$0.00', 472, 3);
+  drawFolioRow(buf, 'BREAKFAST - 4,811 MORNINGS, NO GTA VI', '$0.00', 512, 3);
+  drawDivider(buf, 548);
 
-  // The total due: the whole 13-year wait, priced as one hotel bill.
-  // No subtotal, no tax — the #1 rental receipt shows only TOTAL DUE,
-  // and a folio this long reads cleaner with a single big number.
-  drawFolioRow(buf, 'TOTAL DUE', '$6,576.00', 652, 5);
+  // The total due, then the payoff: the agent zeroes the bill
+  // exactly, like every leader on the board does. TOTAL DUE
+  // $4,830.00, PAID BY AI AGENT - MAKE.FUN -$4,830.00, BALANCE DUE
+  // $0.00. The $0.00 is the punchline — the wait cost thirteen
+  // years, and the agent paid every cent of it.
+  drawFolioRow(buf, 'TOTAL DUE', '$4,830.00', 568, 5);
+  drawFolioRow(buf, 'PAID BY AI AGENT - MAKE.FUN', '-$4,830.00', 620, 3);
+  drawDivider(buf, 656);
+  drawFolioRow(buf, 'BALANCE DUE', '$0.00', 676, 5);
 
   // Magenta footer: the make.fun ghost in a dark disc, who paid,
   // and the make.fun pill — the #1 receipt's own footer shape.
-  // Three lines, one voice: the agent paid, from a bounty, on
-  // make.fun. Nothing else is sold here; the folio already did it.
+  // Three lines, one voice, short and clean: the agent paid, with
+  // real money it earned on make.fun. Nothing else is sold here;
+  // the folio already did it.
   fillRect(buf, 64, 760, 960, 940, MAGENTA);
   fillCircle(buf, 124, 850, 62, GHOST_BG);
   pasteRgba(buf, ghost, 78, 804, 92, 92);
   drawTextLeft(buf, 'PAID BY MY AI AGENT', 210, 790, 4, WHITE);
-  drawTextLeft(buf, 'WITH A BOUNTY PAYOUT', 210, 826, 4, WHITE);
-  drawTextLeft(buf, 'IT EARNED ON MAKE.FUN', 210, 862, 4, WHITE);
+  drawTextLeft(buf, 'WITH REAL MONEY IT', 210, 826, 4, WHITE);
+  drawTextLeft(buf, 'EARNED ON MAKE.FUN', 210, 862, 4, WHITE);
   fillRect(buf, 760, 806, 950, 856, WHITE);
   drawTextCenter(buf, 'MAKE.FUN', 855, 818, 4, MAGENTA);
 
-  // Bottom strip: the sign-off.
-  drawTextCenter(buf, 'THANK YOU FOR STAYING 4,811 NIGHTS', W / 2, 962, 3, MUTED);
+  // Bottom strip: the sign-off. The wait is over.
+  drawTextCenter(buf, 'THANK YOU FOR WAITING 13 YEARS - GTA VI IS HERE', W / 2, 962, 3, MUTED);
   return encodePng(W, H, buf);
 }
 
